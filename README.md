@@ -1,6 +1,6 @@
 # MOBOpt
 
-Multi-objective Bayesian optimization
+Multi-Objective Bayesian Optimization
 
 ## Prerequisites
 
@@ -14,3 +14,15 @@ Multi-objective Bayesian optimization
 ## Instalation
 
   *  Clone this repo to your local machine using `https://github.com/ppgaluzio/MOBOpt.git`
+  *  Add ./MOBOpt to your python path
+
+## Usage
+
+    ``` python
+    import MOBOpt.bayes as by
+    import deap.benchmarks as db
+
+    def target(x):
+        return - np.asarray(db.zdt1(x)) <!-- The method finds the max of the target function -->
+
+    ```
