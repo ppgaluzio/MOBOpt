@@ -13,4 +13,4 @@ Multi-objective Bayesian optimization
 
 ## Instalation
 
-    - Clone this repo to your local machine using `https://github.com/ppgaluzio/MOBOpt.git`
+  *  Clone this repo to your local machine using `https://github.com/ppgaluzio/MOBOpt.git`
