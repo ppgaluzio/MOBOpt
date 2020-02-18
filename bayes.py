@@ -170,6 +170,7 @@ class MOBayesianOpt(object):
 
         Keyword Arguments:
         init_points -- Number of random points to probe
+        points -- list of points in which to sample the method
 
         At first, no points provided by the user are gonna be used by the
         algorithm, Only points calculated randomly, respecting the bounds
@@ -210,6 +211,45 @@ class MOBayesianOpt(object):
                  ReduceProb=False,
                  q=0.5,
                  **gp_params):
+        """
+        maximize
+
+        input
+        -----
+
+        init_points -- int (default 5)
+            number of points in which to initialize the method
+            if initialize was already called it will be ignored
+
+        n_iter -- int (default 100)
+            number of iterations of the method
+
+        prob -- float ( 0 < prob < 1, default 0.1
+            probability of chosing next point randomly
+
+        ReduceProb -- boolean (default False)
+            if True prob is reduced to zero along the iterations of the method
+
+        q -- float ( 0 < q < 1.0, default 0.5 )
+            weight between Search space and objective space when selecting next
+            iteration point
+            q = 1 : objective space only
+            q = 0 : search space only
+
+        return front, pop
+        -----------------
+
+        front -- Pareto front of the method as found by the nsga2 at the
+                 last iteration of the method
+        pop -- population of points in search space as found by the nsga2 at
+               the last iteration of the method
+
+        Outputs:
+        --------
+
+        self.y_Pareto :: list of non-dominated points in objective space
+        self.x_Pareto :: list of non-dominated points in search space
+        """
 
         # allocate necessary memory
 
