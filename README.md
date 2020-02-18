@@ -65,3 +65,22 @@ Multi-Objective Bayesian Optimization
     ax.legend()
     fig.show()
     ```
+
+### Output
+
+   * In file "M.dat", each column correspond to the following
+       * "NDim",  # Dimensionalidade do espaço de busca
+       * "Iter",  # Número de avaliações da função objetivo
+       * "N_init",  # Pontos iniciais
+       * "NPF",     # N. de pts na PF
+       * "GD",      # Generational distance
+       * "SS",      # Spread
+       * "HV",      # Hyervolume
+       * "HausDist",  # Haussdorf Distance
+       * "Cover",     # Coverage
+       * "GDPS",      # GD measured by PS
+       * "SSPS",      # Spread measured by PS
+       * "HDPS",  # Haussdorf distance measured by PS
+       * "Prob",  # Probability
+       * "q",     # Q
+       * "Front"  # Front Filename
