@@ -11,13 +11,13 @@ import sys
 
 @contextlib.contextmanager
 def no_out():
-    # save_stdout = sys.stdout
-    # save_stderr = sys.stderr
-    # sys.stdout = io.BytesIO()
-    # sys.stderr = io.BytesIO()
+    save_stdout = sys.stdout
+    save_stderr = sys.stderr
+    sys.stdout = io.BytesIO()
+    sys.stderr = io.BytesIO()
     yield
-    # sys.stdout = save_stdout
-    # sys.stderr = save_stderr
+    sys.stdout = save_stdout
+    sys.stderr = save_stderr
 
 # temporary definition
 # @contextlib.contextmanager
