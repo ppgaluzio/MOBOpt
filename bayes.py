@@ -17,10 +17,6 @@ from .metrics import GD, Spread2D, Coverage
 from scipy.spatial.distance import directed_hausdorff as HD
 
 
-# from mpl_toolkits.mplot3d import Axes3D
-# from matplotlib import cm
-# from matplotlib.ticker import LinearLocator, FormatStrFormatter
-
 # Class Bayesians Optimization
 
 
@@ -28,18 +24,52 @@ class MOBayesianOpt(object):
 
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
                  verbose=False, Picture=True, TPF=None,
-                 n_restarts_optimizer=1000, Filename="M", MetricsPS=True,
+                 n_restarts_optimizer=100, Filename="M", MetricsPS=True,
                  FrontSampling=[10, 25, 50, 100]):
         """
         Bayesian optimization object
 
         Keyword Arguments:
-        target  -- list of functions to be optimized
+        target  -- functions to be optimized
+                   def target(x): x is a np.array
+                       return [f_1, f_2, ..., f_NObj]
+
         NObj    -- Number of objective functions
-        NParam  -- Number of parameters for the objective function
+
+        NParam  -- Number of parameters for the objective function arguments
+                   len(x) == NParam
+
         pbounds -- numpy array with bounds for each parameter
                    pbounds.shape == (NParam,2)
+
+        constraints -- list of dictionary with constraints
+                   [{'type': 'ineq', 'fun': constr_fun}, ...]
+
+                   def constr_fun(x):
+                       return g(x) # >= 0
+
         verbose -- Whether or not to print progress (default False)
+
+        Picture -- boolean (default True)
+                   whether or not to plot PF convergence
+
+        TPF -- np.ndarray (default None)
+               Array with the True Pareto Front for calculation of
+               convergence metrics
+
+        n_restarts_optimizer -- int (default 100)
+             GP parameter, the number of restarts of the optimizer for
+             finding the kernel’s parameters which maximize the log-marginal
+             likelihood.
+
+        filename -- string (default "M")
+             Partial metrics will be saved at M.dat
+
+        MetricsPS -- boolean (default True)
+             whether os not to calculate metrics with the Pareto Set points
+
+        FrontSampling -- list of ints
+             Number of points to sample the pareto front for metrics
 
         Based heavily on github.com/fmfn/BayesianOptimization
         """
@@ -49,7 +79,7 @@ class MOBayesianOpt(object):
         self.verbose = verbose
         self.vprint = print if verbose else lambda *a, **k: None
         self.FrontSampling = FrontSampling
-        # set counter
+
         self.counter = 0
         self.constraints = constraints
         self.Picture = Picture
@@ -101,32 +131,30 @@ class MOBayesianOpt(object):
                 self.pbounds = pbounds
             else:
                 raise IndexError("pbounds must have dimension equal to NParam")
-        except:
+        except TypeError:
             raise TypeError("pbounds is neither a np.array nor a list")
-        if self.pbounds.shape != (NParam,2) :
+        if self.pbounds.shape != (NParam, 2):
             raise IndexError("pbounds must have 2nd dimension equal to 2")
 
         with no_out():
             self.GP = [None] * self.NObj
-            for i in range(self.NObj) :
+            for i in range(self.NObj):
                 self.GP[i] = GPR(kernel=Matern(nu=1.5),
-                                 n_restarts_optimizer = self.n_rest_opt)
+                                 n_restarts_optimizer=self.n_rest_opt)
 
         # store starting points
         self.init_points = []
 
-        self.space = TargetSpace(self.target,self.NObj,self.pbounds,
-                                 self.constraints,verbose=self.verbose)
+        self.space = TargetSpace(self.target, self.NObj, self.pbounds,
+                                 self.constraints, verbose=self.verbose)
 
-        if self.Picture: #and self.NObj == 2:
-            self.fig,self.ax = pl.subplots(1,1,figsize=(5,4))
+        if self.Picture and self.NObj == 2:
+            self.fig, self.ax = pl.subplots(1, 1, figsize=(5, 4))
             self.fig.show()
 
         return
 
-
-    #%% RESET
-
+    # % RESET
     def __reset__(self):
         """
         RESET all function initialization variables
@@ -135,21 +163,21 @@ class MOBayesianOpt(object):
 
         return
 
-    #%% INIT
-
-    def initialize(self,init_points = None,Points = []):
+    # % INIT
+    def initialize(self, init_points=None, Points=[]):
         """
         Initialization of the method
 
         Keyword Arguments:
         init_points -- Number of random points to probe
 
-        At first, no points provided by the user are gonna be used by the algorithm
-        Only points calculated randomly, respecting the bounds provided
+        At first, no points provided by the user are gonna be used by the
+        algorithm, Only points calculated randomly, respecting the bounds
+        provided
         """
 
         self.N_init_points = 0
-        if init_points != None :
+        if init_points is not None:
             self.N_init_points += init_points
 
             # initialize first points for the gp fit,
@@ -159,13 +187,12 @@ class MOBayesianOpt(object):
             self.init_points = np.asarray(self.init_points)
 
             # evaluate target function at all intialization points
-            for x in self.init_points :
-                y = self.space.observe_point(x)
+            for x in self.init_points:
+                dummy = self.space.observe_point(x)
 
-        if len(Points) > 0 :
-            for ii in range(len(Points)) :
-                xx = Points[ii]
-                y = self.space.observe_point(Points[ii])
+        if len(Points) > 0:
+            for ii in range(len(Points)):
+                dummy = self.space.observe_point(Points[ii])  # noqa
                 self.N_init_points += 1
 
         self.vprint("Added points in init")
@@ -175,14 +202,13 @@ class MOBayesianOpt(object):
 
         return
 
-    #%% maximize
-
+    # % maximize
     def maximize(self,
                  init_points=5,
                  n_iter=100,
                  prob=0.1,
-                 ReduceProb = False,
-                 q = 0.5,
+                 ReduceProb=False,
+                 q=0.5,
                  **gp_params):
 
         # allocate necessary memory
@@ -194,7 +220,7 @@ class MOBayesianOpt(object):
 
         # Else, just allocate the necessary space
         else:
-            if self.N_init_points+n_iter > self.space._n_alloc_rows :
+            if self.N_init_points+n_iter > self.space._n_alloc_rows:
                 self.space._allocate(self.N_init_points+n_iter)
 
         self.q = q
@@ -202,9 +228,9 @@ class MOBayesianOpt(object):
 
         self.vprint("Start optimization loop")
 
-        for i in range(n_iter) :
+        for i in range(n_iter):
 
-            self.vprint(i," of ",n_iter)
+            self.vprint(i, " of ", n_iter)
             if ReduceProb:
                 self.NewProb = prob * (1.0 - self.counter/n_iter)
 
@@ -239,28 +265,27 @@ class MOBayesianOpt(object):
             if np.random.uniform() < self.NewProb:
 
                 if self.NParam > 1:
-                    ii = np.random.randint(low=0,high=self.NParam - 1)
+                    ii = np.random.randint(low=0, high=self.NParam - 1)
                 else:
                     ii = 0
 
-                self.x_try[ii] = np.random.uniform(low = self.pbounds[ii][0],
-                                                   high = self.pbounds[ii][1])
+                self.x_try[ii] = np.random.uniform(low=self.pbounds[ii][0],
+                                                   high=self.pbounds[ii][1])
 
-                self.vprint("Random Point at ",ii," coordinate")
+                self.vprint("Random Point at ", ii, " coordinate")
 
-            y = self.space.observe_point(self.x_try)
+            dummy = self.space.observe_point(self.x_try)  # noqa
 
             self.y_Pareto, self.x_Pareto = self.space.ParetoSet()
             self.counter += 1
 
-            self.vprint ("|PF| = {:4d} at {:4d} of {:4d}, w/ k = {:4.2f}"\
-                         .format(self.space.ParetoSize,
-                                 self.counter,
-                                 n_iter,
-                                 self.NewProb))
+            self.vprint(f"|PF| = {self.space.ParetoSize:4d} at"
+                        f" {self.counter:4d}"
+                        f" of {n_iter:4d}, w/ k = {self.NewProb:4.2f}")
 
             for NFront in self.FrontSampling:
-                if (self.counter % 10 == 0) and (NFront == self.FrontSampling[-1]):
+                if (self.counter % 10 == 0) and \
+                   (NFront == self.FrontSampling[-1]):
                     SaveFile = True
                 else:
                     SaveFile = False
@@ -269,17 +294,16 @@ class MOBayesianOpt(object):
                 self.PrintOutput(front[Ind, :], PopInd,
                                  SaveFile)
 
-
         return front, np.asarray(pop)
 
-    def LargestOfLeast(self,front,F) :
+    def LargestOfLeast(self, front, F):
         NF = len(front)
         MinDist = np.empty(NF)
-        for i in range(NF) :
-            MinDist[i] =  self.MinimalDistance(-front[i],F)
-        # print ("MIN DIST = ",MinDist)
+        for i in range(NF):
+            MinDist[i] = self.MinimalDistance(-front[i], F)
+
         ArgMax = np.argmax(MinDist)
-        # print ("ARGMAX = ",ArgMax," w/ ",MinDist[ArgMax])
+
         Mean = MinDist.mean()
         Std = np.std(MinDist)
         return ArgMax, (MinDist-Mean)/(Std)
@@ -315,33 +339,30 @@ class MOBayesianOpt(object):
             SSPS = np.nan
             HDPS = np.nan
 
-
-        self.vprint("NFront = {}, GD = {:7.3e} | SS = {:7.3e} | HV = {:7.3e} "\
-                    .format(NFront,GenDist, SS, HV))
+        self.vprint(f"NFront = {NFront}, GD = {GenDist:7.3e} |"
+                    f" SS = {SS:7.3e} | HV = {HV:7.3e} ")
 
         if SaveFile:
-            FrontFilename = "FF_D{:02d}_I{:04d}_NI{:02d}_P{:4.2f}_Q{:4.2f}".format(self.NParam,self.counter,self.N_init_points,self.NewProb,self.q)+self.Filename
-
-            # "Front{:03d}_".format(self.counter)+self.Filename
-            # np.savetxt(FrontFilename,front)
-
+            FrontFilename = f"FF_D{self.NParam:02d}_I{self.counter:04d}_" + \
+                f"NI{self.N_init_points:02d}_P{self.NewProb:4.2f}_" + \
+                f"Q{self.q:4.2f}" + \
+                self.Filename
 
             PF = np.asarray([np.asarray(y) for y in self.y_Pareto])
             PS = np.asarray([np.asarray(x) for x in self.x_Pareto])
 
             Population = np.asarray(pop)
             np.savez(FrontFilename,
-                     Front = front,
-                     Pop = Population,
-                     PF = PF,
-                     PS = PS)
+                     Front=front,
+                     Pop=Population,
+                     PF=PF,
+                     PS=PS)
 
             FrontFilename += ".npz"
-        else :
+        else:
             FrontFilename = np.nan
 
-        # try:
-        self.FF.write("{} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n"\
+        self.FF.write("{} {} {} {} {} {} {} {} {} {} {} {} {} {} {}\n"
                       .format(self.NParam,
                               self.counter+len(self.init_points),
                               self.N_init_points,
@@ -357,87 +378,73 @@ class MOBayesianOpt(object):
                               self.NewProb,
                               self.q,
                               FrontFilename))
-        # except:
-        #     print("DID NOT PRINT")
-        #     pass
 
         return
 
-
     @staticmethod
-    def MinimalDistance(X,Y) :
+    def MinimalDistance(X, Y):
         N = len(X)
         Npts = len(Y)
         DistMin = float('inf')
-        for i in range(Npts) :
+        for i in range(Npts):
             Dist = 0.
-            for j in range(N) :
-                Dist += (X[j]-Y[i,j])**2
+            for j in range(N):
+                Dist += (X[j]-Y[i, j])**2
             Dist = np.sqrt(Dist)
-            # Dist = np.absolute(X-Y[i,:]).max()
-            if Dist < DistMin :
+            if Dist < DistMin:
                 DistMin = Dist
         return DistMin
 
-    def MaxDist(self,front,yPareto):
+    def MaxDist(self, front, yPareto):
         NF = len(front)
         IndexMax = 0
-        DistMax = self.DistTotal(-front[0],yPareto)
-        for i in range(1,NF) :
-            Dist = self.DistTotal(-front[i],yPareto)
-            if Dist > DistMax :
+        DistMax = self.DistTotal(-front[0], yPareto)
+        for i in range(1, NF):
+            Dist = self.DistTotal(-front[i], yPareto)
+            if Dist > DistMax:
                 DistMax = Dist
                 IndexMax = i
         return IndexMax
 
     @staticmethod
-    def DistTotal(X,Y):
-        Soma  = 0.0
+    def DistTotal(X, Y):
+        Soma = 0.0
         for i in range(len(Y)):
             Dist = 0.0
-            for j in range(len(X)) :
-                Dist += (X[j]-Y[i,j])**2
+            for j in range(len(X)):
+                Dist += (X[j]-Y[i, j])**2
             Dist = np.sqrt(Dist)
             Soma += Dist
         return Soma / len(Y)
 
+    # % Define the function to be optimized by nsga2
 
-
-
-    #%% Define the function to be optimized by nsga2
-
-
-    def ObjectiveGP(self,x):
+    def ObjectiveGP(self, x):
 
         Fator = 1.0e10
         F = [None] * self.NObj
-        xx = np.asarray(x).reshape(1,-1)
+        xx = np.asarray(x).reshape(1, -1)
 
         Constraints = 0.0
-        for cons in self.constraints :
+        for cons in self.constraints:
             y = cons['fun'](x)
-            if cons['type'] == 'eq' :
+            if cons['type'] == 'eq':
                 Constraints += np.abs(y)
-            elif cons['type'] == 'ineq' :
-                if y < 0 :
+            elif cons['type'] == 'ineq':
+                if y < 0:
                     Constraints -= y
 
-        for i in range(self.NObj) :
-            # Fator = 10.0 * np.max(self.space.f[:,i])
+        for i in range(self.NObj):
             F[i] = -self.GP[i].predict(xx)[0] + Fator * Constraints
 
         return F
 
-
-    #%% Sigmoid
+    # % Sigmoid
     @staticmethod
-    def Sigmoid(x,k=10.) :
+    def Sigmoid(x, k=10.):
         return 1./(1.+np.exp(k*(x-0.5)))
 
-
-    #%% write relevant information to file
-
-    def WriteSpace(self,filename="space"):
+    def WriteSpace(self, filename="space"):
 
         Info = [self.space.NObj,
                 self.space.NParam,
@@ -445,22 +452,22 @@ class MOBayesianOpt(object):
                 self.space.length]
 
         np.savez(filename,
-                 X = self.space._X,
-                 Y = self.space._Y,
-                 F = self.space._F,
-                 I = Info)
+                 X=self.space._X,
+                 Y=self.space._Y,
+                 F=self.space._F,
+                 I=Info)        # noqa
 
         return
 
-    #%% read relevant information from file
+    # % read relevant information from file
 
     def ReadSpace(self, filename="space.npz"):
 
         Data = np.load(filename)
 
-        self.space.NObj   = Data["I"][0]
+        self.space.NObj = Data["I"][0]
         self.space.NParam = Data["I"][1]
-        self.space._NObs  = Data["I"][2]
+        self.space._NObs = Data["I"][2]
         self.space.length = Data["I"][3]
 
         self.space._allocate((self.space.length + 1) * 2)
@@ -471,16 +478,14 @@ class MOBayesianOpt(object):
 
         # Redefine GP
         with no_out():
-        # internal GP regressor
             self.GP = [None] * self.NObj
-            for i in range(self.NObj) :
+            for i in range(self.NObj):
                 self.GP[i] = GPR(kernel=Matern(nu=0.5),
-                                 n_restarts_optimizer = self.n_rest_opt)
+                                 n_restarts_optimizer=self.n_rest_opt)
 
         with no_out():
-            for i in range(self.NObj) :
-                yy = self.space.f[:,i]
-                self.GP[i].fit(self.space.x,yy)
-
+            for i in range(self.NObj):
+                yy = self.space.f[:, i]
+                self.GP[i].fit(self.space.x, yy)
 
         return

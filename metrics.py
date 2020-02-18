@@ -7,7 +7,7 @@ import numpy as np
 # PI (Performance indicators) for static quality of the pareto front only
 
 
-def GD(S, P, q=2):
+def GD(S, P):
     """
     S -> Solution set by the algorithm
     P -> Pareto front (reference set)
@@ -62,7 +62,7 @@ def Coverage(S, NDiv=100):
                 iDiv += 1
             try:
                 Counter[iDiv] = True
-            except:
+            except IndexError:
                 Counter[-1] = True
 
         Cover[iObj] = Counter.sum()/NDiv
