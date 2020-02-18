@@ -84,3 +84,7 @@ Multi-Objective Bayesian Optimization
        * "Prob",  # Probability
        * "q",     # Q
        * "Front"  # Front Filename
+
+### Analysis
+
+Files `PrintFront.py` and `Analisa.py` are examples of how to analyze the output of the method
