@@ -7,7 +7,7 @@ from sklearn.gaussian_process import GaussianProcessRegressor as GPR
 from sklearn.gaussian_process.kernels import Matern
 
 from .target_space import TargetSpace
-from .helpers import no_out, plot_1dgp
+from .helpers import plot_1dgp
 
 from .NSGA2 import NSGAII
 from deap.benchmarks.tools import hypervolume
@@ -132,11 +132,10 @@ class MOBayesianOpt(object):
         if self.pbounds.shape != (NParam, 2):
             raise IndexError("pbounds must have 2nd dimension equal to 2")
 
-        with no_out():
-            self.GP = [None] * self.NObj
-            for i in range(self.NObj):
-                self.GP[i] = GPR(kernel=Matern(nu=1.5),
-                                 n_restarts_optimizer=self.n_rest_opt)
+        self.GP = [None] * self.NObj
+        for i in range(self.NObj):
+            self.GP[i] = GPR(kernel=Matern(nu=1.5),
+                             n_restarts_optimizer=self.n_rest_opt)
 
         # store starting points
         self.init_points = []
@@ -305,10 +304,10 @@ class MOBayesianOpt(object):
             if ReduceProb:
                 self.NewProb = prob * (1.0 - self.counter/n_iter)
 
-            with no_out():
-                for i in range(self.NObj):
-                    yy = self.space.f[:, i]
-                    self.GP[i].fit(self.space.x, yy)
+            for i in range(self.NObj):
+                yy = self.space.f[:, i]
+                self.GP[i].fit(self.space.x, yy)
+
             pop, logbook, front = NSGAII(self.NObj,
                                          self.ObjectiveGP,
                                          self.pbounds,
@@ -551,16 +550,15 @@ class MOBayesianOpt(object):
         self.space._F = Data["F"]
 
         # Redefine GP
-        with no_out():
-            self.GP = [None] * self.NObj
-            for i in range(self.NObj):
-                self.GP[i] = GPR(kernel=Matern(nu=0.5),
-                                 n_restarts_optimizer=self.n_rest_opt)
 
-        with no_out():
-            for i in range(self.NObj):
-                yy = self.space.f[:, i]
-                self.GP[i].fit(self.space.x, yy)
+        self.GP = [None] * self.NObj
+        for i in range(self.NObj):
+            self.GP[i] = GPR(kernel=Matern(nu=0.5),
+                             n_restarts_optimizer=self.n_rest_opt)
+
+        for i in range(self.NObj):
+            yy = self.space.f[:, i]
+            self.GP[i].fit(self.space.x, yy)
 
         self.__CalledInit = True
         self.N_init_points = self.space._NObs
