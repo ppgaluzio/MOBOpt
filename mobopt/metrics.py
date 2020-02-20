@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-# import matplotlib.pyplot as pl
-# from scipy.optimize import minimize
-
-# PI (Performance indicators) for static quality of the pareto front only
 
 
 def GD(S, P):

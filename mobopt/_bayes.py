@@ -6,13 +6,13 @@ import matplotlib.pyplot as pl
 from sklearn.gaussian_process import GaussianProcessRegressor as GPR
 from sklearn.gaussian_process.kernels import Matern
 
-from .target_space import TargetSpace
-from .helpers import plot_1dgp
-
-from .NSGA2 import NSGAII
-from deap.benchmarks.tools import hypervolume
-from .metrics import GD, Spread2D, Coverage
 from scipy.spatial.distance import directed_hausdorff as HD
+from deap.benchmarks.tools import hypervolume
+
+from ._NSGA2 import NSGAII
+from .metrics import GD, Spread2D, Coverage
+from ._target_space import TargetSpace
+from ._helpers import plot_1dgp
 
 
 # Class Bayesians Optimization

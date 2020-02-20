@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-# import probabilities as pb
 
 
 class TargetSpace(object):

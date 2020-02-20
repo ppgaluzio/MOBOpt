@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .bayes import MOBayesianOpt  # noqa
+from ._bayes import MOBayesianOpt  # noqa
