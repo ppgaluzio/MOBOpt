@@ -1,33 +1,23 @@
 # -*- coding: utf-8 -*-
 
-# from __future__ import division
-# from __future__ import print_function
-
 import numpy as np
 
 import array
 import random
 
-from math import sqrt
-
-from deap import algorithms
 from deap import base
-from deap import benchmarks
-from deap.benchmarks.tools import diversity, convergence, hypervolume
 from deap import creator
 from deap import tools
 
 FirstCall = True
 
+
 def uniform(bounds):
-    # N = len(bounds)
-    # x = [random.uniform(b[0],b[1]) for b in bounds]
     return [random.uniform(b[0], b[1]) for b in bounds]
 
 
 def NSGAII(NObj, objective, pbounds, seed=None, NGEN=100, MU=100, CXPB=0.9):
     random.seed(seed)
-    # print("IN NSGAII")
 
     global FirstCall
     if FirstCall:
@@ -37,14 +27,6 @@ def NSGAII(NObj, objective, pbounds, seed=None, NGEN=100, MU=100, CXPB=0.9):
         FirstCall = False
     toolbox = base.Toolbox()
 
-    # Problem definition
-    # Functions zdt1, zdt2, zdt3, zdt6 have bounds [0, 1]
-    # BOUND_LOW, BOUND_UP = 0.0, 1.0
-
-    # Functions zdt4 has bounds x1 = [0, 1], xn = [-5, 5], with n = 2, ..., 10
-    # BOUND_LOW, BOUND_UP = [0.0] + [-5.0]*9, [1.0] + [5.0]*9
-
-    # Functions zdt1, zdt2, zdt3 have 30 dimensions, zdt4 and zdt6 have 10
     NDIM = len(pbounds)
 
     toolbox.register("attr_float", uniform, pbounds)
@@ -60,22 +42,20 @@ def NSGAII(NObj, objective, pbounds, seed=None, NGEN=100, MU=100, CXPB=0.9):
 
     toolbox.register("mate",
                      tools.cxSimulatedBinaryBounded,
-                     low=pbounds[:,0].tolist(),
-                     up=pbounds[:,1].tolist(),
+                     low=pbounds[:, 0].tolist(),
+                     up=pbounds[:, 1].tolist(),
                      eta=20.0)
 
     toolbox.register("mutate",
                      tools.mutPolynomialBounded,
-                     low=pbounds[:,0].tolist(),
-                     up=pbounds[:,1].tolist(),
+                     low=pbounds[:, 0].tolist(),
+                     up=pbounds[:, 1].tolist(),
                      eta=20.0,
-                     indpb=1.0/NDIM)  # verify //
+                     indpb=1.0/NDIM)
 
     toolbox.register("select", tools.selNSGA2)
 
     stats = tools.Statistics(lambda ind: ind.fitness.values)
-    # stats.register("avg", numpy.mean, axis=0)
-    # stats.register("std", numpy.std, axis=0)
     stats.register("min", np.min, axis=0)
     stats.register("max", np.max, axis=0)
 
@@ -96,7 +76,6 @@ def NSGAII(NObj, objective, pbounds, seed=None, NGEN=100, MU=100, CXPB=0.9):
 
     record = stats.compile(pop)
     logbook.record(gen=0, evals=len(invalid_ind), **record)
-    # print(logbook.stream)
 
     # Begin the generational process
     for gen in range(1, NGEN):
@@ -124,7 +103,6 @@ def NSGAII(NObj, objective, pbounds, seed=None, NGEN=100, MU=100, CXPB=0.9):
         logbook.record(gen=gen, evals=len(invalid_ind), **record)
         # print(logbook.stream)
 
-    # print("Final population hypervolume is %f" % hypervolume(pop, [11.0, 11.0]))
     front = np.array([ind.fitness.values for ind in pop])
 
     return pop, logbook, front
