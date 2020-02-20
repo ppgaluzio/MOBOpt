@@ -18,7 +18,7 @@ Multi-Objective Bayesian Optimization
 
 ## Usage
 
-    Check wiki for basic usage
+Check wiki for basic usage
 
 ## Analysis
 
