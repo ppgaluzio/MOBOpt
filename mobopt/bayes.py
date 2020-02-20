@@ -256,14 +256,39 @@ class MOBayesianOpt(object):
         self.x_Pareto :: list of non-dominated points in search space
         """
 
-        # allocate necessary memory
-
         # If initialize was not called, call it and allocate necessary space
         if not self.__CalledInit:
             raise RuntimeError("Initialize was not called, "
                                "call it before calling maximize")
 
+        if not isinstance(n_iter, int):
+            raise TypeError(f"n_iter should be int, {type(n_iter)} instead")
 
+        if not isinstance(nsga2_population_size, int):
+            raise TypeError(f"nsga2_population_size should be int, "
+                            f"{type(nsga2_population_size)} instead")
+
+        if not isinstance(SaveInterval, int):
+            raise TypeError(f"SaveInterval should be int, "
+                            f"{type(SaveInterval)} instead")
+
+        if isinstance(FrontSampling, list):
+            if not all([isinstance(n, int) for n in FrontSampling]):
+                raise TypeError(f"FrontSampling should be list of int")
+        else:
+            raise TypeError(f"FrontSampling should be a list")
+
+        if not isinstance(prob, (int, float)):
+            raise TypeError(f"prob should be float, "
+                            f"{type(prob)} instead")
+
+        if not isinstance(q, (int, float)):
+            raise TypeError(f"q should be float, "
+                            f"{type(q)} instead")
+
+        if not isinstance(ReduceProb, bool):
+            raise TypeError(f"ReduceProb should be bool, "
+                            f"{type(ReduceProb)} instead")
 
         # Allocate necessary space
         if self.N_init_points+n_iter > self.space._n_alloc_rows:
