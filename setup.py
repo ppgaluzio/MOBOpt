@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MOBOpt",
-    version="0.0.1",
+    version="0.0.2",
     author="P. P. Galuzio",
     author_email="galuzio.paulo@protonmail.com",
     description="Multi-Objective Bayesian Optimization",
