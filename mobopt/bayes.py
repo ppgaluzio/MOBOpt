@@ -20,10 +20,8 @@ class MOBayesianOpt(object):
 
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
                  verbose=False, Picture=True, TPF=None,
-                 n_restarts_optimizer=100, Filename="M", MetricsPS=True,
-                 FrontSampling=[10, 25, 50, 100]):
-        """
-        Bayesian optimization object
+                 n_restarts_optimizer=100, Filename=None, MetricsPS=True):
+        """Bayesian optimization object
 
         Keyword Arguments:
         target  -- functions to be optimized
@@ -58,23 +56,21 @@ class MOBayesianOpt(object):
              finding the kernel’s parameters which maximize the log-marginal
              likelihood.
 
-        filename -- string (default "M")
-             Partial metrics will be saved at M.dat
+        Filename -- string (default None)
+             Partial metrics will be
+             saved at filename, if None nothing is saved
 
         MetricsPS -- boolean (default True)
              whether os not to calculate metrics with the Pareto Set points
 
-        FrontSampling -- list of ints
-             Number of points to sample the pareto front for metrics
-
         Based heavily on github.com/fmfn/BayesianOptimization
+
         """
 
         super(MOBayesianOpt, self).__init__()
 
         self.verbose = verbose
         self.vprint = print if verbose else lambda *a, **k: None
-        self.FrontSampling = FrontSampling
 
         self.counter = 0
         self.constraints = constraints
@@ -114,12 +110,16 @@ class MOBayesianOpt(object):
             self.Metrics = True
             self.TPF = TPF
 
-        self.vprint("Filename = "+self.Filename+".dat")
-        self.FF = open(Filename+".dat", "a", 1)
-        self.vprint("Saving:")
-        self.vprint("NParam, iter, N init, NFront,"
-                    "GenDist, SS, HV, HausDist, Cover, GDPS, SSPS,"
-                    "HDPS, NewProb, q, FrontFilename")
+        if self.Filename is not None:
+            self.__save_partial = True
+            self.vprint("Filename = "+self.Filename)
+            self.FF = open(Filename, "a", 1)
+            self.vprint("Saving:")
+            self.vprint("NParam, iter, N init, NFront,"
+                        "GenDist, SS, HV, HausDist, Cover, GDPS, SSPS,"
+                        "HDPS, NewProb, q, FrontFilename")
+        else:
+            self.__save_partial = False
 
         # pbounds must hold the bounds for each parameter
         try:
@@ -205,6 +205,9 @@ class MOBayesianOpt(object):
                  prob=0.1,
                  ReduceProb=False,
                  q=0.5,
+                 nsga2_population_size=100,
+                 SaveInterval=10,
+                 FrontSampling=[10, 25, 50, 100],
                  **gp_params):
         """
         maximize
@@ -227,6 +230,17 @@ class MOBayesianOpt(object):
             q = 1 : objective space only
             q = 0 : search space only
 
+        nsga2_population_size -- int
+            effective size of the pareto front
+            (len(front = nsga2_population_size))
+
+        SaveInterval -- int
+            at every SaveInterval save a npz file with the full pareto front at
+            that iteration
+
+        FrontSampling -- list of ints
+             Number of points to sample the pareto front for metrics
+
         return front, pop
         =================
 
@@ -242,12 +256,39 @@ class MOBayesianOpt(object):
         self.x_Pareto :: list of non-dominated points in search space
         """
 
-        # allocate necessary memory
-
         # If initialize was not called, call it and allocate necessary space
         if not self.__CalledInit:
             raise RuntimeError("Initialize was not called, "
                                "call it before calling maximize")
+
+        if not isinstance(n_iter, int):
+            raise TypeError(f"n_iter should be int, {type(n_iter)} instead")
+
+        if not isinstance(nsga2_population_size, int):
+            raise TypeError(f"nsga2_population_size should be int, "
+                            f"{type(nsga2_population_size)} instead")
+
+        if not isinstance(SaveInterval, int):
+            raise TypeError(f"SaveInterval should be int, "
+                            f"{type(SaveInterval)} instead")
+
+        if isinstance(FrontSampling, list):
+            if not all([isinstance(n, int) for n in FrontSampling]):
+                raise TypeError(f"FrontSampling should be list of int")
+        else:
+            raise TypeError(f"FrontSampling should be a list")
+
+        if not isinstance(prob, (int, float)):
+            raise TypeError(f"prob should be float, "
+                            f"{type(prob)} instead")
+
+        if not isinstance(q, (int, float)):
+            raise TypeError(f"q should be float, "
+                            f"{type(q)} instead")
+
+        if not isinstance(ReduceProb, bool):
+            raise TypeError(f"ReduceProb should be bool, "
+                            f"{type(ReduceProb)} instead")
 
         # Allocate necessary space
         if self.N_init_points+n_iter > self.space._n_alloc_rows:
@@ -270,7 +311,8 @@ class MOBayesianOpt(object):
                     self.GP[i].fit(self.space.x, yy)
             pop, logbook, front = NSGAII(self.NObj,
                                          self.ObjectiveGP,
-                                         self.pbounds)
+                                         self.pbounds,
+                                         MU=nsga2_population_size)
 
             Population = np.asarray(pop)
             IndexF, FatorF = self.LargestOfLeast(front, self.space.f)
@@ -313,16 +355,18 @@ class MOBayesianOpt(object):
                         f" {self.counter:4d}"
                         f" of {n_iter:4d}, w/ k = {self.NewProb:4.2f}")
 
-            for NFront in self.FrontSampling:
-                if (self.counter % 10 == 0) and \
-                   (NFront == self.FrontSampling[-1]):
-                    SaveFile = True
-                else:
-                    SaveFile = False
-                Ind = np.random.choice(front.shape[0], NFront, replace=False)
-                PopInd = [pop[i] for i in Ind]
-                self.PrintOutput(front[Ind, :], PopInd,
-                                 SaveFile)
+            if self.__save_partial:
+                for NFront in FrontSampling:
+                    if (self.counter % SaveInterval == 0) and \
+                       (NFront == FrontSampling[-1]):
+                        SaveFile = True
+                    else:
+                        SaveFile = False
+                    Ind = np.random.choice(front.shape[0], NFront,
+                                           replace=False)
+                    PopInd = [pop[i] for i in Ind]
+                    self.PrintOutput(front[Ind, :], PopInd,
+                                     SaveFile)
 
         return front, np.asarray(pop)
 
