@@ -8,18 +8,14 @@ from sklearn.gaussian_process.kernels import Matern
 
 from .target_space import TargetSpace
 from .helpers import no_out, plot_1dgp
-# import types
 
 from .NSGA2 import NSGAII
-# import deap.benchmarks as db
 from deap.benchmarks.tools import hypervolume
 from .metrics import GD, Spread2D, Coverage
 from scipy.spatial.distance import directed_hausdorff as HD
 
 
 # Class Bayesians Optimization
-
-
 class MOBayesianOpt(object):
 
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
@@ -205,7 +201,6 @@ class MOBayesianOpt(object):
 
     # % maximize
     def maximize(self,
-                 init_points=5,
                  n_iter=100,
                  prob=0.1,
                  ReduceProb=False,
@@ -215,11 +210,7 @@ class MOBayesianOpt(object):
         maximize
 
         input
-        -----
-
-        init_points -- int (default 5)
-            number of points in which to initialize the method
-            if initialize was already called it will be ignored
+        =====
 
         n_iter -- int (default 100)
             number of iterations of the method
@@ -237,15 +228,15 @@ class MOBayesianOpt(object):
             q = 0 : search space only
 
         return front, pop
-        -----------------
+        =================
 
         front -- Pareto front of the method as found by the nsga2 at the
                  last iteration of the method
         pop -- population of points in search space as found by the nsga2 at
                the last iteration of the method
 
-        Outputs:
-        --------
+        Outputs
+        =======
 
         self.y_Pareto :: list of non-dominated points in objective space
         self.x_Pareto :: list of non-dominated points in search space
@@ -255,13 +246,12 @@ class MOBayesianOpt(object):
 
         # If initialize was not called, call it and allocate necessary space
         if not self.__CalledInit:
-            self.initialize(init_points)
-            self.space._allocate(init_points+n_iter)
+            raise RuntimeError("Initialize was not called, "
+                               "call it before calling maximize")
 
-        # Else, just allocate the necessary space
-        else:
-            if self.N_init_points+n_iter > self.space._n_alloc_rows:
-                self.space._allocate(self.N_init_points+n_iter)
+        # Allocate necessary space
+        if self.N_init_points+n_iter > self.space._n_alloc_rows:
+            self.space._allocate(self.N_init_points+n_iter)
 
         self.q = q
         self.NewProb = prob
