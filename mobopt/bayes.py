@@ -562,4 +562,6 @@ class MOBayesianOpt(object):
                 yy = self.space.f[:, i]
                 self.GP[i].fit(self.space.x, yy)
 
+        self.__CalledInit = True
+        self.N_init_points = self.space._NObs
         return
