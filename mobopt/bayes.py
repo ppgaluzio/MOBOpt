@@ -205,6 +205,7 @@ class MOBayesianOpt(object):
                  prob=0.1,
                  ReduceProb=False,
                  q=0.5,
+                 nsga2_population_size=100,
                  SaveInterval=10,
                  FrontSampling=[10, 25, 50, 100],
                  **gp_params):
@@ -228,6 +229,10 @@ class MOBayesianOpt(object):
             iteration point
             q = 1 : objective space only
             q = 0 : search space only
+
+        nsga2_population_size -- int
+            effective size of the pareto front
+            (len(front = nsga2_population_size))
 
         SaveInterval -- int
             at every SaveInterval save a npz file with the full pareto front at
@@ -258,6 +263,8 @@ class MOBayesianOpt(object):
             raise RuntimeError("Initialize was not called, "
                                "call it before calling maximize")
 
+
+
         # Allocate necessary space
         if self.N_init_points+n_iter > self.space._n_alloc_rows:
             self.space._allocate(self.N_init_points+n_iter)
@@ -279,7 +286,8 @@ class MOBayesianOpt(object):
                     self.GP[i].fit(self.space.x, yy)
             pop, logbook, front = NSGAII(self.NObj,
                                          self.ObjectiveGP,
-                                         self.pbounds)
+                                         self.pbounds,
+                                         MU=nsga2_population_size)
 
             Population = np.asarray(pop)
             IndexF, FatorF = self.LargestOfLeast(front, self.space.f)
