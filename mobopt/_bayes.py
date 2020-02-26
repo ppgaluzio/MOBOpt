@@ -254,7 +254,6 @@ class MOBayesianOpt(object):
         self.y_Pareto :: list of non-dominated points in objective space
         self.x_Pareto :: list of non-dominated points in search space
         """
-
         # If initialize was not called, call it and allocate necessary space
         if not self.__CalledInit:
             raise RuntimeError("Initialize was not called, "
