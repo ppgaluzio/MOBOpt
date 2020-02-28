@@ -15,6 +15,10 @@ from ._target_space import TargetSpace
 from ._helpers import plot_1dgp
 
 
+class ConstraintError(Exception):
+    pass
+
+
 # Class Bayesians Optimization
 class MOBayesianOpt(object):
 
@@ -139,6 +143,12 @@ class MOBayesianOpt(object):
 
         # store starting points
         self.init_points = []
+
+        # test for constraint types
+        for cc in self.constraints:
+            if cc['type'] == 'eq':
+                raise ConstraintError(
+                    "Equality constraints are not implemented")
 
         self.space = TargetSpace(self.target, self.NObj, self.pbounds,
                                  self.constraints, verbose=self.verbose)

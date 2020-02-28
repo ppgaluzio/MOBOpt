@@ -33,7 +33,6 @@ class TargetSpace(object):
         self.init_points = init_points
 
         if len(self.constraints) == 0:
-            # self.vprint ("No Constraint")
             self.__NoConstraint = True
 
         # Find number of parameters
