@@ -20,7 +20,7 @@ class MOBayesianOpt(object):
 
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
                  verbose=False, Picture=True, TPF=None,
-                 n_restarts_optimizer=100, Filename=None, MetricsPS=True):
+                 n_restarts_optimizer=10, Filename=None, MetricsPS=True):
         """Bayesian optimization object
 
         Keyword Arguments:
@@ -28,7 +28,7 @@ class MOBayesianOpt(object):
                    def target(x): x is a np.array
                        return [f_1, f_2, ..., f_NObj]
 
-        NObj    -- Number of objective functions
+        NObj    -- int, Number of objective functions
 
         NParam  -- Number of parameters for the objective function arguments
                    len(x) == NParam
@@ -44,7 +44,7 @@ class MOBayesianOpt(object):
 
         verbose -- Whether or not to print progress (default False)
 
-        Picture -- boolean (default True)
+        Picture -- bool (default True)
                    whether or not to plot PF convergence
 
         TPF -- np.ndarray (default None)
@@ -60,7 +60,7 @@ class MOBayesianOpt(object):
              Partial metrics will be
              saved at filename, if None nothing is saved
 
-        MetricsPS -- boolean (default True)
+        MetricsPS -- bool (default True)
              whether os not to calculate metrics with the Pareto Set points
 
         Based heavily on github.com/fmfn/BayesianOptimization
@@ -220,7 +220,7 @@ class MOBayesianOpt(object):
         prob -- float ( 0 < prob < 1, default 0.1
             probability of chosing next point randomly
 
-        ReduceProb -- boolean (default False)
+        ReduceProb -- bool (default False)
             if True prob is reduced to zero along the iterations of the method
 
         q -- float ( 0 < q < 1.0, default 0.5 )
