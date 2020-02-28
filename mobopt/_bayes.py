@@ -204,7 +204,7 @@ class MOBayesianOpt(object):
                  prob=0.1,
                  ReduceProb=False,
                  q=0.5,
-                 nsga2_population_size=100,
+                 n_pts=100,
                  SaveInterval=10,
                  FrontSampling=[10, 25, 50, 100],
                  **gp_params):
@@ -229,9 +229,9 @@ class MOBayesianOpt(object):
             q = 1 : objective space only
             q = 0 : search space only
 
-        nsga2_population_size -- int
+        n_pts -- int
             effective size of the pareto front
-            (len(front = nsga2_population_size))
+            (len(front = n_pts))
 
         SaveInterval -- int
             at every SaveInterval save a npz file with the full pareto front at
@@ -262,9 +262,9 @@ class MOBayesianOpt(object):
         if not isinstance(n_iter, int):
             raise TypeError(f"n_iter should be int, {type(n_iter)} instead")
 
-        if not isinstance(nsga2_population_size, int):
-            raise TypeError(f"nsga2_population_size should be int, "
-                            f"{type(nsga2_population_size)} instead")
+        if not isinstance(n_pts, int):
+            raise TypeError(f"n_pts should be int, "
+                            f"{type(n_pts)} instead")
 
         if not isinstance(SaveInterval, int):
             raise TypeError(f"SaveInterval should be int, "
@@ -310,7 +310,7 @@ class MOBayesianOpt(object):
             pop, logbook, front = NSGAII(self.NObj,
                                          self.ObjectiveGP,
                                          self.pbounds,
-                                         MU=nsga2_population_size)
+                                         MU=n_pts)
 
             Population = np.asarray(pop)
             IndexF, FatorF = self.LargestOfLeast(front, self.space.f)
