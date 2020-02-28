@@ -201,6 +201,10 @@ class MOBayesianOpt(object):
                 dummy = self.space.observe_point(Points[ii])  # noqa
                 self.N_init_points += 1
 
+        if self.N_init_points == 0:
+            raise RuntimeError(
+                "A non-zero number of initialization points is required")
+
         self.vprint("Added points in init")
         self.vprint(self.space.x)
 
