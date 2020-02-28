@@ -18,7 +18,7 @@ Multi-Objective Bayesian Optimization
 
 ## Usage
 
-Check wiki for basic usage
+Check [wiki](https://github.com/ppgaluzio/MOBOpt/wiki") for basic usage and documentation
 
 ## Analysis
 
