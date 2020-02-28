@@ -220,8 +220,7 @@ class MOBayesianOpt(object):
                  q=0.5,
                  n_pts=100,
                  SaveInterval=10,
-                 FrontSampling=[10, 25, 50, 100],
-                 **gp_params):
+                 FrontSampling=[10, 25, 50, 100]):
         """
         maximize
 
