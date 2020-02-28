@@ -321,13 +321,13 @@ class MOBayesianOpt(object):
                 self.GP[i].fit(self.space.x, yy)
 
             pop, logbook, front = NSGAII(self.NObj,
-                                         self.ObjectiveGP,
+                                         self.__ObjectiveGP,
                                          self.pbounds,
                                          MU=n_pts)
 
             Population = np.asarray(pop)
-            IndexF, FatorF = self.LargestOfLeast(front, self.space.f)
-            IndexPop, FatorPop = self.LargestOfLeast(Population, self.space.x)
+            IndexF, FatorF = self.__LargestOfLeast(front, self.space.f)
+            IndexPop, FatorPop = self.__LargestOfLeast(Population, self.space.x)
 
             Fator = self.q * FatorF + (1-self.q) * FatorPop
             Index_try = np.argmax(Fator)
@@ -376,16 +376,16 @@ class MOBayesianOpt(object):
                     Ind = np.random.choice(front.shape[0], NFront,
                                            replace=False)
                     PopInd = [pop[i] for i in Ind]
-                    self.PrintOutput(front[Ind, :], PopInd,
+                    self.__PrintOutput(front[Ind, :], PopInd,
                                      SaveFile)
 
         return front, np.asarray(pop)
 
-    def LargestOfLeast(self, front, F):
+    def __LargestOfLeast(self, front, F):
         NF = len(front)
         MinDist = np.empty(NF)
         for i in range(NF):
-            MinDist[i] = self.MinimalDistance(-front[i], F)
+            MinDist[i] = self.__MinimalDistance(-front[i], F)
 
         ArgMax = np.argmax(MinDist)
 
@@ -393,7 +393,7 @@ class MOBayesianOpt(object):
         Std = np.std(MinDist)
         return ArgMax, (MinDist-Mean)/(Std)
 
-    def PrintOutput(self, front, pop, SaveFile=False):
+    def __PrintOutput(self, front, pop, SaveFile=False):
 
         NFront = front.shape[0]
 
@@ -467,7 +467,7 @@ class MOBayesianOpt(object):
         return
 
     @staticmethod
-    def MinimalDistance(X, Y):
+    def __MinimalDistance(X, Y):
         N = len(X)
         Npts = len(Y)
         DistMin = float('inf')
@@ -480,19 +480,19 @@ class MOBayesianOpt(object):
                 DistMin = Dist
         return DistMin
 
-    def MaxDist(self, front, yPareto):
+    def __MaxDist(self, front, yPareto):
         NF = len(front)
         IndexMax = 0
-        DistMax = self.DistTotal(-front[0], yPareto)
+        DistMax = self.__DistTotal(-front[0], yPareto)
         for i in range(1, NF):
-            Dist = self.DistTotal(-front[i], yPareto)
+            Dist = self.__DistTotal(-front[i], yPareto)
             if Dist > DistMax:
                 DistMax = Dist
                 IndexMax = i
         return IndexMax
 
     @staticmethod
-    def DistTotal(X, Y):
+    def __DistTotal(X, Y):
         Soma = 0.0
         for i in range(len(Y)):
             Dist = 0.0
@@ -504,7 +504,7 @@ class MOBayesianOpt(object):
 
     # % Define the function to be optimized by nsga2
 
-    def ObjectiveGP(self, x):
+    def __ObjectiveGP(self, x):
 
         Fator = 1.0e10
         F = [None] * self.NObj
@@ -524,9 +524,9 @@ class MOBayesianOpt(object):
 
         return F
 
-    # % Sigmoid
+    # % __Sigmoid
     @staticmethod
-    def Sigmoid(x, k=10.):
+    def __Sigmoid(x, k=10.):
         return 1./(1.+np.exp(k*(x-0.5)))
 
     def WriteSpace(self, filename="space"):
