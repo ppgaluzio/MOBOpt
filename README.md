@@ -22,4 +22,5 @@ Check [wiki](https://github.com/ppgaluzio/MOBOpt/wiki) for basic usage and docum
 
 ## Analysis
 
-Files `PrintFront.py` and `Analisa.py` are examples of how to analyze the output of the method
+Files `PrintFront.py` and `Analisa.py`, in the scripts folder, are
+examples of how to analyze the output of the method
