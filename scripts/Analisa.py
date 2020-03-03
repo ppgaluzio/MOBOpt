@@ -5,23 +5,25 @@ import numpy as np
 import matplotlib.pyplot as pl
 import pandas as pd
 
+# See documentation for description of each column
+
 M = pd.read_csv("M.dat",
                 sep=' ',
-                names=["NDim",  # Dimensionalidade do espaço de busca
-                       "Iter",  # Número de avaliações da função objetivo
-                       "N_init",  # Pontos iniciais
-                       "NPF",     # N. de pts na PF
-                       "GD",      # Generational distance
-                       "SS",      # Spread
-                       "HV",      # Hyervolume
-                       "HausDist",  # Haussdorf Distance
-                       "Cover",     # Coverage
-                       "GDPS",      # GD measured by PS
-                       "SSPS",      # Spread measured by PS
-                       "HDPS",  # Haussdorf distance measured by PS
-                       "Prob",  # Probability
-                       "q",     # Q
-                       "Front"])  # Front Filename
+                names=["NDim",
+                       "Iter",
+                       "N_init",
+                       "NPF",
+                       "GD",
+                       "SS",
+                       "HV",
+                       "HausDist",
+                       "Cover",
+                       "GDPS",
+                       "SSPS",
+                       "HDPS",
+                       "Prob",
+                       "q",
+                       "Front"])
 
 ZG = {}
 Keys = []
