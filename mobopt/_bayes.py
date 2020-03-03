@@ -327,7 +327,8 @@ class MOBayesianOpt(object):
 
             Population = np.asarray(pop)
             IndexF, FatorF = self.__LargestOfLeast(front, self.space.f)
-            IndexPop, FatorPop = self.__LargestOfLeast(Population, self.space.x)
+            IndexPop, FatorPop = self.__LargestOfLeast(Population,
+                                                       self.space.x)
 
             Fator = self.q * FatorF + (1-self.q) * FatorPop
             Index_try = np.argmax(Fator)
