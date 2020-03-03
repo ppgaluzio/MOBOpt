@@ -378,7 +378,7 @@ class MOBayesianOpt(object):
                                            replace=False)
                     PopInd = [pop[i] for i in Ind]
                     self.__PrintOutput(front[Ind, :], PopInd,
-                                     SaveFile)
+                                       SaveFile)
 
         return front, np.asarray(pop)
 
