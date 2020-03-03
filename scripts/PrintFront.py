@@ -7,7 +7,6 @@ Simple script that prints the Pareto front of a given file
 
 import numpy as np
 import matplotlib.pyplot as pl
-from scipy.spatial.distance import directed_hausdorff as HD
 
 import argparse
 
@@ -27,26 +26,19 @@ if args.TPF is not None:
     f1 = F1[ISorted]
     f2 = F2[ISorted]
 
-if args.Filename[-3:] == "dat" or args.Filename[-3:] == "txt":
-
-    F1D2, F2D2 = np.loadtxt(args.Filename, unpack=True)
-    I2 = np.argsort(F1D2)
-
-elif args.Filename[-3:] == "npz":
+if args.Filename[-3:] == "npz":
     Data = np.load(args.Filename)
     F1D2, F2D2 = Data["Front"][:, 0], Data["Front"][:, 1]
     I2 = np.argsort(F1D2)
 
 else:
-    raise TypeError("Extension should be txt, dat or npz")
+    raise TypeError("Extension should be npz")
 
 pl.plot(F1D2[I2], F2D2[I2], 'o--', label="Bayes")
 if args.TPF is not None:
     pl.plot(f1, f2, 'o', label="TPF")
     pl.legend()
 
-    print("Antes")
-    print(HD(Data["Front"], np.asarray([f1, f2]).T)[0])
 pl.xlabel(r"$f_1$")
 pl.ylabel(r"$f_2$")
 
