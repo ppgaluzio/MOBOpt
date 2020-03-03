@@ -30,7 +30,7 @@ Metric = "GD"
 
 fig = pl.figure(Metric)
 
-ZG = zdt1.\
+ZG = M.\
     groupby("NPF").get_group(100).\
     groupby("Iter").agg(np.mean).reset_index()
 
