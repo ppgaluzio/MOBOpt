@@ -1,8 +1,10 @@
 # MOBOpt
 
-Multi-Objective Bayesian Optimization
-
 [![DOI](https://zenodo.org/badge/234795274.svg)](https://zenodo.org/badge/latestdoi/234795274)
+
+---
+
+Multi-Objective Bayesian Optimization
 
 ## Prerequisites
 
