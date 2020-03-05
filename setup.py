@@ -9,7 +9,7 @@ def get_property(prop, project):
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-project_name = "MOBOpt"
+project_name = "mobopt"
 
 setuptools.setup(
     name="MOBOpt",
