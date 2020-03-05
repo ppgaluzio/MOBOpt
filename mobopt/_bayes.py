@@ -35,10 +35,10 @@ def max_or_min_wrapper(function, max_or_min):
 # Class Bayesians Optimization
 class MOBayesianOpt(object):
 
-    def __init__(self, target, NObj, NParam, pbounds, constraints=[],
+    def __init__(self, target, NObj, pbounds, constraints=[],
                  verbose=False, Picture=False, TPF=None,
-                 n_restarts_optimizer=10, Filename=None, MetricsPS=True,
-                 max_or_min='max', RandomSeed=None):
+                 n_restarts_optimizer=10, Filename=None,
+                 MetricsPS=True, max_or_min='max', RandomSeed=None):
         """Bayesian optimization object
 
         Keyword Arguments:
@@ -47,9 +47,6 @@ class MOBayesianOpt(object):
                        return [f_1, f_2, ..., f_NObj]
 
         NObj    -- int, Number of objective functions
-
-        NParam  -- Number of parameters for the objective function arguments
-                   len(x) == NParam
 
         pbounds -- numpy array with bounds for each parameter
                    pbounds.shape == (NParam,2)
@@ -130,13 +127,16 @@ class MOBayesianOpt(object):
         else:
             raise TypeError("target should be callable")
 
-        # number of parameters
-        if isinstance(NParam, int):
-            self.NParam = NParam
-        else:
-            raise TypeError("NParam should be int")
+        self.pbounds = pbounds
+        # pbounds must hold the bounds for each parameter
+        try:
+            self.NParam = len(pbounds)
+        except TypeError:
+            raise TypeError("pbounds is neither a np.array nor a list")
+        if self.pbounds.shape != (self.NParam, 2):
+            raise IndexError("pbounds must have 2nd dimension equal to 2")
 
-        # print("NParam = ",self.NParam)
+        self.vprint(f"Dim. of Search Space = {self.NParam}")
 
         if TPF is None:
             self.vprint("no metrics are going to be saved")
@@ -157,16 +157,6 @@ class MOBayesianOpt(object):
         else:
             self.__save_partial = False
 
-        # pbounds must hold the bounds for each parameter
-        try:
-            if len(pbounds) == self.NParam:
-                self.pbounds = pbounds
-            else:
-                raise IndexError("pbounds must have dimension equal to NParam")
-        except TypeError:
-            raise TypeError("pbounds is neither a np.array nor a list")
-        if self.pbounds.shape != (NParam, 2):
-            raise IndexError("pbounds must have 2nd dimension equal to 2")
 
         self.GP = [None] * self.NObj
         for i in range(self.NObj):
