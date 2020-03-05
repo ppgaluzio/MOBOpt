@@ -8,6 +8,7 @@ from sklearn.gaussian_process.kernels import Matern
 
 from scipy.spatial.distance import directed_hausdorff as HD
 from deap.benchmarks.tools import hypervolume
+from warnings import warn
 
 from ._NSGA2 import NSGAII
 from .metrics import GD, Spread2D, Coverage
@@ -49,7 +50,7 @@ class MOBayesianOpt(object):
         verbose -- Whether or not to print progress (default False)
 
         Picture -- bool (default True)
-                   whether or not to plot PF convergence
+                   whether or not to plot PF convergence, for NObj = 2 only
 
         TPF -- np.ndarray (default None)
                Array with the True Pareto Front for calculation of
@@ -78,7 +79,13 @@ class MOBayesianOpt(object):
 
         self.counter = 0
         self.constraints = constraints
-        self.Picture = Picture
+        if self.Picture and self.NObj == 2:
+            self.Picture = Picture
+        else:
+            if Picture:
+                warn("NObj must be 2 to plot PF convergence")
+            self.Picture = False
+
         self.n_rest_opt = n_restarts_optimizer
         self.Filename = Filename
         self.MetricsPS = MetricsPS
