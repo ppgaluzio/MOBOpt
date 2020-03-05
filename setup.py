@@ -1,11 +1,19 @@
 import setuptools
 
+import re
+
+def get_property(prop, project):
+    result = re.search(r'{}\s*=\s*[\'"]([^\'"]*)[\'"]'.format(prop), open(project + '/__init__.py').read())
+    return result.group(1)
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+project_name = "MOBOpt"
+
 setuptools.setup(
     name="MOBOpt",
-    version="v1.0.0",
+    version= get_property('__version__', project_name),
     author="P. P. Galuzio",
     author_email="galuzio.paulo@protonmail.com",
     description="Multi-Objective Bayesian Optimization",
