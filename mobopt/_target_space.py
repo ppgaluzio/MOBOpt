@@ -106,6 +106,28 @@ class TargetSpace(object):
         except:                 # noqa
             return False
 
+    def __repr__(self):
+        HeaderX = ''.join(f'   X{i}    ' for i in range(self.NParam))
+        HeaderY = ''.join(f'   F{i}    ' for i in range(self.NObj))
+        Out = HeaderX+' | '+HeaderY+'\n'
+        for i in range(self.length):
+            LineX = ''.join(f'{i:+3.1e} ' for i in self.x[i])
+            LineY = ''.join(f'{i:+3.1e} ' for i in self.f[i])
+            Out += LineX+' | '+LineY+'\n'
+        return Out
+
+    def __getitem__(self, key):
+        if isinstance(key, slice):
+            return self.x[key], self.f[key]
+        elif isinstance(key, int):
+            if key < self.length:
+                return self.x[key], self.f[key]
+            else:
+                raise KeyError(f"key ({key}) larger than {self.length}")
+        else:
+            raise TypeError(f"Invalid key type for space")
+
+
     # % RANDOM POINTS
     def random_points(self, num):
         """
