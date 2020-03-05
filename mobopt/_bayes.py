@@ -578,8 +578,6 @@ class MOBayesianOpt(object):
                  F=self.space._F,
                  I=Info)        # noqa
 
-        self.vprint("Written to "+filename+".npz")
-
         return
 
     # % read relevant information from file
