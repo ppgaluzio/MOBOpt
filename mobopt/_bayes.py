@@ -38,7 +38,7 @@ class MOBayesianOpt(object):
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
                  verbose=False, Picture=False, TPF=None,
                  n_restarts_optimizer=10, Filename=None, MetricsPS=True,
-                 max_or_min='max'):
+                 max_or_min='max', RandomSeed=None):
         """Bayesian optimization object
 
         Keyword Arguments:
@@ -84,6 +84,14 @@ class MOBayesianOpt(object):
         max_or_min -- str (default 'max')
              whether the optimization problem is a maximization
              problem ('max'), or a minimization one ('min')
+
+        RandomSeed -- {None, int, array_like}, optional
+            Random seed used to initialize the pseudo-random number
+            generator. Can be any integer between 0 and 2**32 - 1
+            inclusive, an array (or other sequence) of such integers,
+            or None (the default). If seed is None, then RandomState
+            will try to read data from /dev/urandom (or the Windows
+            analogue) if available or seed from the clock otherwise.
 
         Based heavily on github.com/fmfn/BayesianOptimization
 
@@ -175,7 +183,9 @@ class MOBayesianOpt(object):
                     "Equality constraints are not implemented")
 
         self.space = TargetSpace(self.target, self.NObj, self.pbounds,
-                                 self.constraints, verbose=self.verbose)
+                                 self.constraints,
+                                 RandomSeed=RandomSeed,
+                                 verbose=self.verbose)
 
         if self.Picture and self.NObj == 2:
             self.fig, self.ax = pl.subplots(1, 1, figsize=(5, 4))

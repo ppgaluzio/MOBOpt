@@ -9,7 +9,7 @@ class TargetSpace(object):
     """
 
     def __init__(self, target_function, NObj, pbounds, constraints,
-                 init_points=2, verbose=False):
+                 RandomSeed, init_points=2, verbose=False):
         """
         Keyword Arguments:
         target_function -- list of Functions to be maximized
@@ -21,7 +21,7 @@ class TargetSpace(object):
 
         self.vprint = print if verbose else lambda *a, **k: None
 
-        self.RS = np.random.RandomState()
+        self.RS = np.random.RandomState(seed=RandomSeed)
 
         self.target_function = target_function
         self.NObj = NObj
