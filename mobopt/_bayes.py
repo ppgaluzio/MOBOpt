@@ -24,7 +24,7 @@ class ConstraintError(Exception):
 class MOBayesianOpt(object):
 
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
-                 verbose=False, Picture=True, TPF=None,
+                 verbose=False, Picture=False, TPF=None,
                  n_restarts_optimizer=10, Filename=None, MetricsPS=True):
         """Bayesian optimization object
 
@@ -79,13 +79,6 @@ class MOBayesianOpt(object):
 
         self.counter = 0
         self.constraints = constraints
-        if self.Picture and self.NObj == 2:
-            self.Picture = Picture
-        else:
-            if Picture:
-                warn("NObj must be 2 to plot PF convergence")
-            self.Picture = False
-
         self.n_rest_opt = n_restarts_optimizer
         self.Filename = Filename
         self.MetricsPS = MetricsPS
@@ -98,6 +91,13 @@ class MOBayesianOpt(object):
             self.NObj = NObj
         else:
             raise TypeError("NObj should be int")
+
+        if Picture and self.NObj == 2:
+            self.Picture = Picture
+        else:
+            if Picture:
+                warn("NObj must be 2 to plot PF convergence")
+            self.Picture = False
 
         # objective function returns lists w/ the multiple target functions
         if callable(target):
