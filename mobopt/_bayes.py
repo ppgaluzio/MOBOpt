@@ -20,12 +20,25 @@ class ConstraintError(Exception):
     pass
 
 
+def max_or_min_wrapper(function, max_or_min):
+    if max_or_min == 'max':
+        def fun_wrapper(*wrapper_args):
+            return function(*(wrapper_args))
+    elif max_or_min == 'min':
+        def fun_wrapper(*wrapper_args):
+            return - function(*(wrapper_args))
+    else:
+        raise ValueError("max_or_min should be either 'max' or 'min'")
+    return fun_wrapper
+
+
 # Class Bayesians Optimization
 class MOBayesianOpt(object):
 
     def __init__(self, target, NObj, NParam, pbounds, constraints=[],
                  verbose=False, Picture=False, TPF=None,
-                 n_restarts_optimizer=10, Filename=None, MetricsPS=True):
+                 n_restarts_optimizer=10, Filename=None, MetricsPS=True,
+                 max_or_min='max'):
         """Bayesian optimization object
 
         Keyword Arguments:
@@ -68,6 +81,10 @@ class MOBayesianOpt(object):
         MetricsPS -- bool (default True)
              whether os not to calculate metrics with the Pareto Set points
 
+        max_or_min -- str (default 'max')
+             whether the optimization problem is a maximization
+             problem ('max'), or a minimization one ('min')
+
         Based heavily on github.com/fmfn/BayesianOptimization
 
         """
@@ -101,7 +118,7 @@ class MOBayesianOpt(object):
 
         # objective function returns lists w/ the multiple target functions
         if callable(target):
-            self.target = target
+            self.target = max_or_min_wrapper(target, max_or_min)
         else:
             raise TypeError("target should be callable")
 
