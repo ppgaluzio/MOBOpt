@@ -380,15 +380,16 @@ class MOBayesianOpt(object):
                           iterations=self.counter+len(self.init_points),
                           Front=front, last=Index_try)
 
-            if np.random.uniform() < self.NewProb:
+            if self.space.RS.uniform() < self.NewProb:
 
                 if self.NParam > 1:
-                    ii = np.random.randint(low=0, high=self.NParam - 1)
+                    ii = self.space.RS.randint(low=0, high=self.NParam - 1)
                 else:
                     ii = 0
 
-                self.x_try[ii] = np.random.uniform(low=self.pbounds[ii][0],
-                                                   high=self.pbounds[ii][1])
+                self.x_try[ii] = self.space.RS.uniform(
+                    low=self.pbounds[ii][0],
+                    high=self.pbounds[ii][1])
 
                 self.vprint("Random Point at ", ii, " coordinate")
 
@@ -408,8 +409,8 @@ class MOBayesianOpt(object):
                         SaveFile = True
                     else:
                         SaveFile = False
-                    Ind = np.random.choice(front.shape[0], NFront,
-                                           replace=False)
+                    Ind = self.space.RS.choice(front.shape[0], NFront,
+                                               replace=False)
                     PopInd = [pop[i] for i in Ind]
                     self.__PrintOutput(front[Ind, :], PopInd,
                                        SaveFile)
