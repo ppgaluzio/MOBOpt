@@ -11,7 +11,7 @@ setuptools.setup(
     description="Multi-Objective Bayesian Optimization",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/ppgaluzio/PastaPhase",
+    url="https://github.com/ppgaluzio/MOBOpt",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
