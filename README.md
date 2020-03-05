@@ -17,6 +17,7 @@ Multi-Objective Bayesian Optimization
 
   *  Clone this repo to your local machine using `https://github.com/ppgaluzio/MOBOpt.git`
   *  Run `python3 setup.py install`
+  * Using pip `pip3 install https://github.com/ppgaluzio/MOBOpt/archive/master.zip`
 
 ## Usage
 
