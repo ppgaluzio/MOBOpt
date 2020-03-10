@@ -2,4 +2,4 @@
 
 from ._bayes import MOBayesianOpt  # noqa
 
-__version__ = "v1.0.0-alpha"
+__version__ = "v1.0.0"
