@@ -96,7 +96,7 @@ def main():
 
     fig, ax = pl.subplots(1, 1)
     ax.plot(f1, f2, '-', label="TPF")
-    ax.plot(-PF[:, 0], -PF[:, 1], 'o', label=r"$\chi$")
+    ax.scatter(front[:, 0], front[:, 1], label=r"$\chi$")
     ax.grid()
     ax.set_xlabel(r'$f_1$')
     ax.set_ylabel(r'$f_2$')
