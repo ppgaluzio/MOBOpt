@@ -390,7 +390,7 @@ class MOBayesianOpt(object):
 
             self.vprint(f"|PF| = {self.space.ParetoSize:4d} at"
                         f" {self.counter:4d}"
-                        f" of {n_iter:4d}, w/ k = {self.NewProb:4.2f}")
+                        f" of {n_iter:4d}, w/ r = {self.NewProb:4.2f}")
 
             if self.__save_partial:
                 for NFront in FrontSampling:
