@@ -82,10 +82,6 @@ def main():
                                    FrontSampling=[100],
                                    ReduceProb=args.Reduce)
 
-    print(type(front), front.shape)
-
-    print(type(pop), pop.shape)
-
     PF = np.asarray([np.asarray(y) for y in Optimize.y_Pareto])
     PS = np.asarray([np.asarray(x) for x in Optimize.x_Pareto])
 
