@@ -27,3 +27,21 @@ Check [wiki](https://github.com/ppgaluzio/MOBOpt/wiki) for basic usage and docum
 
 Files `PrintFront.py` and `Analisa.py`, in the scripts folder, are
 examples of how to analyze the output of the method
+
+## Cite
+
+To cite MOBOpt, please refer to our paper:
+
+```
+@article{GALUZIO2020100520,
+title = "MOBOpt — multi-objective Bayesian optimization",
+journal = "SoftwareX",
+volume = "12",
+pages = "100520",
+year = "2020",
+issn = "2352-7110",
+doi = "https://doi.org/10.1016/j.softx.2020.100520",
+url = "http://www.sciencedirect.com/science/article/pii/S2352711020300911",
+author = "Paulo Paneque Galuzio and Emerson Hochsteiner [de Vasconcelos Segundo] and Leandro dos Santos Coelho and Viviana Cocco Mariani"
+}
+```
