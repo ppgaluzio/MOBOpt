@@ -1,7 +1,5 @@
 # MOBOpt
 
-<!-- [![DOI](https://zenodo.org/badge/234795274.svg)](https://zenodo.org/badge/latestdoi/234795274) -->
-
 Multi-Objective Bayesian Optimization
 
 ## Prerequisites
@@ -30,7 +28,7 @@ examples of how to analyze the output of the method
 
 ## Cite
 
-To cite MOBOpt, please refer to our paper:
+To cite MOBOpt, please refer to our [paper](https://doi.org/10.1016/j.softx.2020.100520):
 
 ```
 @article{GALUZIO2020100520,
