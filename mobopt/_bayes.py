@@ -193,17 +193,20 @@ class MOBayesianOpt(object):
         return
 
     # % INIT
-    def initialize(self, init_points=None, Points=[]):
-        """
-        Initialization of the method
+    def initialize(self, init_points=None, Points=None, Y=None):
+        """Initialization of the method
 
         Keyword Arguments:
         init_points -- Number of random points to probe
         points -- list of points in which to sample the method
+        Y -- (optional) list values of the objective function at the
+            points in `Points`. If not provided the method evaluates
+            the objective at the points in `Points`
 
         At first, no points provided by the user are gonna be used by the
         algorithm, Only points calculated randomly, respecting the bounds
         provided
+
         """
 
         self.N_init_points = 0
@@ -218,12 +221,17 @@ class MOBayesianOpt(object):
 
             # evaluate target function at all intialization points
             for x in self.init_points:
-                dummy = self.space.observe_point(x)
+                self.space.observe_point(x)
 
-        if len(Points) > 0:
-            for ii in range(len(Points)):
-                dummy = self.space.observe_point(Points[ii])  # noqa
-                self.N_init_points += 1
+        if Points is not None:
+            if Y is None:
+                for x in Points:
+                    self.space.observe_point(np.array(x))
+                    self.N_init_points += 1
+            else:
+                for x, y in zip(Points, Y):
+                    self.space.add_observation(np.array(x), np.array(y))
+                    self.N_init_points += 1
 
         if self.N_init_points == 0:
             raise RuntimeError(
