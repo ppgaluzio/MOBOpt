@@ -198,7 +198,7 @@ class MOBayesianOpt(object):
 
         Keyword Arguments:
         init_points -- Number of random points to probe
-        points -- list of points in which to sample the method
+        points -- (optional) list of points in which to sample the method
         Y -- (optional) list values of the objective function at the
             points in `Points`. If not provided the method evaluates
             the objective at the points in `Points`
