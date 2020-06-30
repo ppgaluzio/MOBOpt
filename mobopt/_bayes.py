@@ -38,7 +38,8 @@ class MOBayesianOpt(object):
     def __init__(self, target, NObj, pbounds, constraints=[],
                  verbose=False, Picture=False, TPF=None,
                  n_restarts_optimizer=10, Filename=None,
-                 MetricsPS=True, max_or_min='max', RandomSeed=None):
+                 MetricsPS=True, max_or_min='max', RandomSeed=None,
+                 kernel=None):
         """Bayesian optimization object
 
         Keyword Arguments:
@@ -89,6 +90,13 @@ class MOBayesianOpt(object):
             or None (the default). If seed is None, then RandomState
             will try to read data from /dev/urandom (or the Windows
             analogue) if available or seed from the clock otherwise.
+
+        kernel -- kernel object
+            kernel object to be passed to the gausian process
+            regressor, if None, the default `Matern(nu=1.5)` is used
+
+            For valid kernel objects, visit:
+            https://scikit-learn.org/stable/modules/gaussian_process.html#kernels-for-gaussian-processes)
 
         Based heavily on github.com/fmfn/BayesianOptimization
 
@@ -157,10 +165,12 @@ class MOBayesianOpt(object):
         else:
             self.__save_partial = False
 
+        if kernel is None:
+            kernel = Matern(nu=1.5)
 
         self.GP = [None] * self.NObj
         for i in range(self.NObj):
-            self.GP[i] = GPR(kernel=Matern(nu=1.5),
+            self.GP[i] = GPR(kernel=kernel,
                              n_restarts_optimizer=self.n_rest_opt)
 
         # store starting points
