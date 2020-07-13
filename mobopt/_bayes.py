@@ -3,13 +3,14 @@
 import numpy as np
 import matplotlib.pyplot as pl
 
-from sklearn.gaussian_process import GaussianProcessRegressor as GPR
+# from sklearn.gaussian_process import GaussianProcessRegressor as GPR
 from sklearn.gaussian_process.kernels import Matern
 
 from scipy.spatial.distance import directed_hausdorff as HD
 from deap.benchmarks.tools import hypervolume
 from warnings import warn
 
+from ._wrapper import GaussianProcessWrapper as GPR
 from ._NSGA2 import NSGAII
 from .metrics import GD, Spread2D, Coverage
 from ._target_space import TargetSpace
