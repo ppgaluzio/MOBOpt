@@ -28,7 +28,7 @@ examples of how to analyze the output of the method
 
 ## Cite
 
-To cite MOBOpt, please refer to our [paper](https://doi.org/10.1016/j.softx.2020.100520):
+To cite MOBOpt, please refer to our [paper](https://doi.org/10.1016/j.softx.2020.100520)
 
 ```
 @article{GALUZIO2020100520,
@@ -43,3 +43,5 @@ url = "http://www.sciencedirect.com/science/article/pii/S2352711020300911",
 author = "Paulo Paneque Galuzio and Emerson Hochsteiner [de Vasconcelos Segundo] and Leandro dos Santos Coelho and Viviana Cocco Mariani"
 }
 ```
+
+For the actual version described in the publication, refer to release [v1.0](https://github.com/ppgaluzio/MOBOpt/releases/tag/v1.0)
